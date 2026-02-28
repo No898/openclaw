@@ -493,17 +493,6 @@ async function enforceInboundDirectAccess(params: {
     };
   }
 
-  if (dmPolicy === "open") {
-    return {
-      allowed: true,
-      isGroup,
-      chatId,
-      senderId,
-      senderName,
-      commandAuthorized: undefined,
-    };
-  }
-
   const configAllowFrom = (account.config.allowFrom ?? []).map((v) => String(v));
   const { senderAllowedForCommands, commandAuthorized } = await resolveSenderCommandAuthorization({
     cfg: config,
@@ -519,6 +508,17 @@ async function enforceInboundDirectAccess(params: {
     resolveCommandAuthorizedFromAuthorizers: (authParams) =>
       core.channel.commands.resolveCommandAuthorizedFromAuthorizers(authParams),
   });
+
+  if (dmPolicy === "open") {
+    return {
+      allowed: true,
+      isGroup,
+      chatId,
+      senderId,
+      senderName,
+      commandAuthorized,
+    };
+  }
 
   if (!senderAllowedForCommands) {
     if (dmPolicy === "pairing") {
